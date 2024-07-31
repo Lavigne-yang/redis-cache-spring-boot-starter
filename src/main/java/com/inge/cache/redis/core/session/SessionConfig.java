@@ -1,7 +1,9 @@
 package com.inge.cache.redis.core.session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.inge.cache.redis.core.config.CacheExtendProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -11,18 +13,28 @@ import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
 /**
- * 引入session才会生效
+ * 引入session后，配置session才会生效
  *
  * @author lavyoung1325
  */
-@ConditionalOnClass(RedisHttpSessionConfiguration.class)
+@ConditionalOnProperty(prefix = "spring.redis", name = "session")
 @Configuration
 public class SessionConfig {
+
+    // properties
+    CacheExtendProperties cacheExtendProperties;
+
+    /**
+     * 构造
+     */
+    public SessionConfig(CacheExtendProperties cacheExtendProperties) {
+        this.cacheExtendProperties = cacheExtendProperties;
+    }
 
     /**
      * session 序列化
      *
-     * @return
+     * @return redis序列化
      */
     @Bean
     public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
@@ -32,14 +44,14 @@ public class SessionConfig {
     /**
      * cookie 序列化
      *
-     * @return
+     * @return cookie序列化
      */
     @Bean
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
-        cookieSerializer.setCookiePath("/");
-        cookieSerializer.setDomainName("lavyoung.com");
-        cookieSerializer.setCookieName("GMSESSION");
+        cookieSerializer.setCookiePath(cacheExtendProperties.getSession().getCookiePath());
+        cookieSerializer.setDomainName(cacheExtendProperties.getSession().getDomainName());
+        cookieSerializer.setCookieName(cacheExtendProperties.getSession().getCookieName());
         return cookieSerializer;
     }
 

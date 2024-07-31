@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 核心服务，对缓存内容进行操作
- *
+ * RedisTemplate<String, Object>
  * <dl>
  *    1. 操作
  * </dl>
@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings("unused")
 public class RedisService {
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**

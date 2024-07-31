@@ -1,5 +1,6 @@
 package com.inge.cache.redis.core;
 
+import com.inge.cache.redis.core.config.CacheExtendProperties;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 import reactor.util.annotation.Nullable;
@@ -14,14 +15,17 @@ import java.nio.charset.StandardCharsets;
  */
 public class RedisKeySerializer implements RedisSerializer<String> {
 
-
     /**
      * Redis key 的前缀
      */
-    private final RedisExtendConfig redisExtendConfig;
+    private final CacheExtendProperties cacheExtendProperties;
 
-    public RedisKeySerializer(RedisExtendConfig redisExtendConfig) {
-        this.redisExtendConfig = redisExtendConfig;
+    /**
+     * 构造器
+     * @param cacheExtendProperties 配置
+     */
+    public RedisKeySerializer(CacheExtendProperties cacheExtendProperties) {
+        this.cacheExtendProperties = cacheExtendProperties;
     }
 
     /**
@@ -29,12 +33,13 @@ public class RedisKeySerializer implements RedisSerializer<String> {
      */
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 
+
     @Override
     public byte[] serialize(@Nullable String key) throws SerializationException {
         if (key == null || key.isEmpty()) {
             return new byte[0];
         } else {
-            String prefix = redisExtendConfig.getPrefix();
+            String prefix = cacheExtendProperties.getPrefix();
             if (prefix == null || prefix.isEmpty()) {
                 return key.getBytes(CHARSET);
             } else {
@@ -48,7 +53,7 @@ public class RedisKeySerializer implements RedisSerializer<String> {
         if (bytes == null || bytes.length == 0) {
             return null;
         } else {
-            String prefix = redisExtendConfig.getPrefix();
+            String prefix = cacheExtendProperties.getPrefix();
             if (prefix == null || prefix.isEmpty()) {
                 return new String(bytes, CHARSET);
             } else {

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.DefaultBaseTypeLimitingValidator;
+import com.inge.cache.redis.core.config.CacheExtendProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,26 +30,26 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
  * @author lavyoung1325
  */
 @Configuration
-@ConditionalOnClass(RedisService.class)
 @ComponentScan("com.inge.cache.redis")
 @EnableCaching
-@EnableConfigurationProperties({RedisExtendConfig.class, CacheProperties.class})
+@ConditionalOnBean(CacheExtendProperties.class)
+@EnableConfigurationProperties({CacheExtendProperties.class, CacheProperties.class})
 public class RedisServiceAutoConfigure {
 
     RedisKeySerializer keyRedisSerializer;
 
     RedisConnectionFactory redisConnectionFactory;
 
-    RedisExtendConfig redisExtendConfig;
+    CacheExtendProperties cacheExtendProperties;
     /**
      * 构造注入
      *
-     * @param redisExtendConfig 额外增加的redis配置
+     * @param cacheExtendProperties 额外增加的redis配置
      */
     @Autowired
-    public RedisServiceAutoConfigure(RedisExtendConfig redisExtendConfig, RedisConnectionFactory redisConnectionFactory) {
-        keyRedisSerializer = new RedisKeySerializer(redisExtendConfig);
-        this.redisExtendConfig = redisExtendConfig;
+    public RedisServiceAutoConfigure(CacheExtendProperties cacheExtendProperties, RedisConnectionFactory redisConnectionFactory) {
+        keyRedisSerializer = new RedisKeySerializer(cacheExtendProperties);
+        this.cacheExtendProperties = cacheExtendProperties;
         this.redisConnectionFactory = redisConnectionFactory;
     }
 

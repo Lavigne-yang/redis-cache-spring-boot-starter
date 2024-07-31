@@ -1,24 +1,28 @@
 package com.inge.cache.redis.core.redisson;
 
+import com.inge.cache.redis.core.config.CacheExtendProperties;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * @author lavyoung1325
  */
-@Configuration
+@Component
+@ConditionalOnProperty(prefix = "spring.redis", name = "redisson")
 public class RedissonConfig {
 
-    private final RedisProperties redisProperties;
+    private final CacheExtendProperties cacheExtendProperties;
 
     @Autowired
-    public RedissonConfig(RedisProperties redisProperties) {
-        this.redisProperties = redisProperties;
+    public RedissonConfig(CacheExtendProperties cacheExtendProperties) {
+        this.cacheExtendProperties = cacheExtendProperties;
     }
 
     /**
@@ -30,8 +34,8 @@ public class RedissonConfig {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        String redisUrl = String.format("redis://%s:%s", redisProperties.getHost(), redisProperties.getPort());
-        config.useSingleServer().setAddress(redisUrl).setPassword(redisProperties.getPassword());
+        String redisUrl = String.format("redis://%s:%s", cacheExtendProperties.getHost(), cacheExtendProperties.getPort());
+        config.useSingleServer().setAddress(redisUrl).setPassword(cacheExtendProperties.getPassword());
         config.useSingleServer().setConnectionMinimumIdleSize(10);
         return Redisson.create(config);
     }
